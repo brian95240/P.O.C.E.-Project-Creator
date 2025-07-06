@@ -1,0 +1,464 @@
+# poce_config.yaml
+# Optimized Configuration for P.O.C.E. Project Creator v4.0
+# Designed for maximum DevOps automation and resource efficiency
+
+# Core project configuration
+project:
+  name: ""  # Will be populated by GUI
+  type: "web_application"  # Options: web_application, mobile_app, api_service, ml_model, data_pipeline, automation_tool, microservice
+  goal: ""  # Will be populated by GUI
+  description: ""
+  version: "1.0.0"
+  
+  # Project structure optimization
+  structure:
+    auto_generate: true
+    template_engine: "jinja2"
+    best_practices_enforcement: true
+    
+  # Quality gates
+  quality_gates:
+    code_coverage_threshold: 80
+    security_scan_threshold: "high"
+    performance_threshold: 95
+    accessibility_compliance: "WCAG-AA"
+
+# GitHub integration and automation
+github:
+  token: ""  # Will be populated by GUI (encrypted storage recommended)
+  username: ""  # Auto-detected from token
+  organization: ""  # Optional: for organization repositories
+  
+  # Repository settings
+  repository:
+    visibility: "private"  # Options: private, public, internal
+    auto_init: true
+    default_branch: "main"
+    protection_rules:
+      enabled: true
+      require_reviews: 2
+      dismiss_stale_reviews: true
+      require_status_checks: true
+      enforce_admins: false
+    
+  # GitHub Actions automation
+  actions:
+    auto_deploy: true
+    workflows:
+      ci_cd: true
+      security_scanning: true
+      dependency_updates: true
+      performance_testing: true
+      code_quality_checks: true
+    
+    # Secrets management
+    secrets:
+      auto_create: true
+      rotation_schedule: "monthly"
+      encryption_level: "high"
+
+# MCP Server Configuration and Optimization
+mcp_servers:
+  enabled: true
+  auto_discover: true
+  optimization_engine: "smithery_ai"
+  
+  # Required capabilities for intelligent server selection
+  required_capabilities:
+    - "context_management"
+    - "task_automation"
+    - "ci_cd_integration"
+    - "testing_frameworks"
+    - "monitoring_alerting"
+    - "security_scanning"
+    - "performance_optimization"
+    - "code_quality_analysis"
+    
+  # Synergy optimization settings
+  synergy:
+    enabled: true
+    max_servers: 8
+    min_synergy_score: 75
+    auto_cascade: true
+    performance_weighting:
+      speed: 0.35
+      accuracy: 0.30
+      resource_efficiency: 0.25
+      reliability: 0.10
+  
+  # Smithery.ai integration
+  smithery:
+    api_endpoint: "https://smithery.ai/api/v1"
+    cache_duration: 3600  # 1 hour
+    fallback_enabled: true
+    performance_tracking: true
+  
+  # Server priority matrix (auto-updated based on performance)
+  priority_servers:
+    context7:
+      priority: 1
+      capabilities: ["context_management", "rag_optimization"]
+      synergy_bonus: 25
+    claude_task_manager:
+      priority: 2
+      capabilities: ["task_automation", "workflow_orchestration"]
+      synergy_bonus: 20
+    github_actions_enhanced:
+      priority: 3
+      capabilities: ["ci_cd_integration", "deployment_automation"]
+      synergy_bonus: 15
+
+# Workflow Engine Configuration
+workflow:
+  # Execution settings
+  execution:
+    cascading_enabled: true
+    parallel_execution: true
+    max_concurrent_tasks: 6  # Optimized for modern multi-core systems
+    retry_attempts: 3
+    timeout_seconds: 300
+    graceful_degradation: true
+  
+  # Performance optimization
+  optimization:
+    resource_pooling: true
+    task_batching: true
+    intelligent_scheduling: true
+    load_balancing: true
+    memory_management: "aggressive"
+  
+  # Phases and their dependencies
+  phases:
+    setup:
+      parallel_tasks: 3
+      timeout: 60
+      critical: true
+    repository:
+      parallel_tasks: 4
+      timeout: 120
+      depends_on: ["setup"]
+    documents:
+      parallel_tasks: 3
+      timeout: 90
+      depends_on: ["repository"]
+    devops:
+      parallel_tasks: 5
+      timeout: 180
+      depends_on: ["repository", "documents"]
+    validation:
+      parallel_tasks: 2
+      timeout: 60
+      depends_on: ["devops"]
+  
+  # Cascading automation rules
+  cascading:
+    auto_trigger: true
+    dependency_resolution: "smart"
+    failure_isolation: true
+    rollback_capability: true
+
+# Performance and Resource Optimization
+optimization:
+  # Resource efficiency settings
+  resource_efficiency: "maximum"  # Options: low, medium, high, maximum
+  
+  # Speed optimization
+  speed_priority: true
+  caching:
+    enabled: true
+    strategy: "intelligent"
+    ttl: 1800  # 30 minutes
+    compression: true
+  
+  # Accuracy and validation
+  accuracy_checks: "comprehensive"  # Options: basic, standard, comprehensive
+  validation:
+    real_time: true
+    batch_validation: true
+    cross_validation: true
+  
+  # Performance monitoring
+  monitoring:
+    enabled: true
+    metrics_collection: "detailed"
+    alerting: true
+    dashboard: "grafana"
+    retention_days: 30
+
+# Document Configuration and Templates
+documents:
+  # Product Requirements Document
+  prd:
+    enabled: false  # Set by GUI
+    template: "enhanced"  # Options: basic, standard, enhanced, custom
+    auto_generate: true
+    file_path: ""  # Set by file attachment
+    priority: 1
+    
+    # Template configuration
+    template_config:
+      sections:
+        - "executive_summary"
+        - "user_stories"
+        - "functional_requirements"
+        - "non_functional_requirements"
+        - "technical_specifications"
+        - "success_metrics"
+      auto_populate: true
+      stakeholder_review: true
+  
+  # Product Requirements Prompt
+  prp:
+    enabled: false  # Set by GUI
+    template: "rag_optimized"
+    auto_generate: true
+    file_path: ""  # Set by file attachment
+    priority: 2
+    
+    template_config:
+      prompt_engineering: "advanced"
+      context_optimization: true
+      response_formatting: "structured"
+      fallback_prompts: true
+  
+  # Master RAG Prompt
+  master_prompt:
+    enabled: false  # Set by GUI
+    template: "enterprise"
+    auto_generate: true
+    file_path: ""  # Set by file attachment
+    priority: 3
+    
+    template_config:
+      rag_strategy: "hybrid"
+      context_window_optimization: true
+      retrieval_accuracy: "high"
+      response_coherence: "maximum"
+
+# DevOps Automation and CI/CD
+devops:
+  # CI/CD Pipeline
+  ci_cd_pipeline:
+    enabled: true
+    platform: "github_actions"  # Options: github_actions, gitlab_ci, jenkins, azure_devops
+    
+    # Pipeline stages
+    stages:
+      - name: "validation"
+        parallel: true
+        jobs: ["lint", "security_scan", "dependency_check"]
+      - name: "testing"
+        parallel: true
+        jobs: ["unit_tests", "integration_tests", "e2e_tests"]
+      - name: "build"
+        parallel: false
+        jobs: ["compile", "package", "optimize"]
+      - name: "deploy"
+        parallel: false
+        jobs: ["staging_deploy", "smoke_tests", "production_deploy"]
+  
+  # Testing automation
+  testing:
+    frameworks:
+      unit: "pytest"  # For Python projects
+      integration: "pytest"
+      e2e: "playwright"
+      performance: "locust"
+    
+    coverage:
+      enabled: true
+      threshold: 80
+      report_format: ["html", "xml", "json"]
+    
+    automation:
+      test_generation: true
+      regression_testing: true
+      mutation_testing: false  # Resource intensive
+  
+  # Security scanning
+  security:
+    enabled: true
+    tools:
+      sast: "semgrep"  # Static Application Security Testing
+      dast: "zap"      # Dynamic Application Security Testing
+      sca: "safety"    # Software Composition Analysis
+      secrets: "truffleHog"
+    
+    policies:
+      vulnerability_threshold: "medium"
+      license_compliance: true
+      secrets_detection: true
+      compliance_frameworks: ["SOC2", "GDPR"]
+  
+  # Performance monitoring
+  monitoring:
+    enabled: true
+    tools:
+      metrics: "prometheus"
+      visualization: "grafana"
+      alerting: "alertmanager"
+      tracing: "jaeger"
+    
+    alerts:
+      performance_degradation: true
+      error_rate_threshold: 5  # percentage
+      response_time_threshold: 500  # milliseconds
+      availability_threshold: 99.9  # percentage
+  
+  # Deployment automation
+  deployment:
+    strategy: "blue_green"  # Options: rolling, blue_green, canary
+    environments: ["development", "staging", "production"]
+    
+    automation:
+      staging_auto_deploy: true
+      production_approval: true
+      rollback_automation: true
+      health_checks: true
+
+# File and Template Management
+file_management:
+  # Supported file types for attachments
+  supported_types:
+    - ".md"
+    - ".txt"
+    - ".pdf"
+    - ".docx"
+    - ".json"
+    - ".yaml"
+    - ".yml"
+    - ".html"
+    - ".rtf"
+  
+  # Processing options
+  processing:
+    auto_convert: true
+    encoding_detection: true
+    format_validation: true
+    virus_scanning: false  # Enable if security is critical
+  
+  # Storage optimization
+  storage:
+    compression: true
+    encryption: "AES-256"
+    backup: true
+    versioning: true
+
+# Quality Assurance and Testing
+quality_assurance:
+  # Code quality standards
+  code_quality:
+    linting: true
+    formatting: "black"  # For Python
+    complexity_threshold: 10
+    maintainability_index: 70
+  
+  # Automated testing
+  testing_strategy:
+    test_driven_development: false
+    behavior_driven_development: true
+    property_based_testing: false
+  
+  # Review automation
+  review_automation:
+    pr_analysis: true
+    code_suggestions: true
+    security_review: true
+    performance_review: true
+
+# Notification and Reporting
+notifications:
+  # Communication channels
+  channels:
+    email: false
+    slack: false
+    teams: false
+    discord: false
+  
+  # Notification triggers
+  triggers:
+    workflow_completion: true
+    errors_failures: true
+    security_alerts: true
+    performance_issues: true
+  
+  # Reporting
+  reporting:
+    frequency: "daily"
+    format: ["html", "pdf"]
+    include_metrics: true
+    include_recommendations: true
+
+# Backup and Recovery
+backup:
+  enabled: true
+  frequency: "daily"
+  retention_days: 30
+  
+  # Backup targets
+  targets:
+    configuration: true
+    project_files: true
+    generated_documents: true
+    performance_metrics: true
+  
+  # Recovery options
+  recovery:
+    automatic: false
+    point_in_time: true
+    incremental: true
+
+# Advanced Features
+advanced:
+  # AI-powered optimizations
+  ai_optimization:
+    enabled: true
+    learning_mode: "adaptive"
+    suggestion_engine: true
+    predictive_scaling: false
+  
+  # Experimental features
+  experimental:
+    quantum_optimization: false
+    edge_computing: false
+    serverless_execution: false
+  
+  # Enterprise features
+  enterprise:
+    multi_tenancy: false
+    audit_logging: true
+    compliance_reporting: true
+    sso_integration: false
+
+# Logging and Debugging
+logging:
+  level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "structured"  # Options: simple, detailed, structured, json
+  
+  # Log destinations
+  destinations:
+    file: true
+    console: true
+    syslog: false
+    cloud: false
+  
+  # Log rotation
+  rotation:
+    enabled: true
+    max_size: "100MB"
+    backup_count: 5
+    compress: true
+
+# Version and Compatibility
+version:
+  config_version: "4.0"
+  compatibility:
+    min_python_version: "3.9"
+    max_python_version: "3.12"
+    required_libraries:
+      - "customtkinter>=5.0.0"
+      - "PyGithub>=1.58.0"
+      - "PyPDF2>=3.0.0"
+      - "pyyaml>=6.0"
+      - "aiohttp>=3.8.0"
+      - "requests>=2.28.0"

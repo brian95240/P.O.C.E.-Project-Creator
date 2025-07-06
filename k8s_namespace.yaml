@@ -1,0 +1,867 @@
+# k8s/namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: poce-system
+  labels:
+    name: poce-system
+    app.kubernetes.io/name: poce-project-creator
+    app.kubernetes.io/version: "4.0.0"
+    app.kubernetes.io/component: devops-automation
+    app.kubernetes.io/part-of: poce-platform
+
+---
+# k8s/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: poce-config
+  namespace: poce-system
+  labels:
+    app: poce-project-creator
+data:
+  # Application configuration
+  poce_config.yaml: |
+    project:
+      type: "web_application"
+      quality_gates:
+        code_coverage_threshold: 80
+        security_scan_threshold: "high"
+    
+    mcp_servers:
+      enabled: true
+      auto_discover: true
+      optimization_engine: "smithery_ai"
+      synergy:
+        enabled: true
+        max_servers: 8
+        performance_weighting:
+          speed: 0.35
+          accuracy: 0.30
+          resource_efficiency: 0.25
+          reliability: 0.10
+    
+    workflow:
+      execution:
+        max_concurrent_tasks: 6
+        timeout_seconds: 300
+        graceful_degradation: true
+      optimization:
+        resource_pooling: true
+        intelligent_scheduling: true
+    
+    devops:
+      ci_cd_pipeline:
+        enabled: true
+        platform: "github_actions"
+      testing:
+        frameworks:
+          unit: "pytest"
+          integration: "pytest"
+          e2e: "playwright"
+      monitoring:
+        enabled: true
+        tools:
+          metrics: "prometheus"
+          visualization: "grafana"
+    
+    logging:
+      level: "INFO"
+      format: "structured"
+      destinations:
+        file: true
+        console: true
+
+  # Nginx configuration
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    
+    http {
+        upstream poce_backend {
+            server poce-app-service:8080;
+        }
+        
+        server {
+            listen 80;
+            server_name localhost;
+            
+            location / {
+                proxy_pass http://poce_backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+            
+            location /health {
+                access_log off;
+                proxy_pass http://poce_backend/health;
+            }
+        }
+    }
+
+---
+# k8s/secrets.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: poce-secrets
+  namespace: poce-system
+  labels:
+    app: poce-project-creator
+type: Opaque
+data:
+  # Base64 encoded values - replace with actual secrets
+  github-token: "" # echo -n "your_github_token" | base64
+  smithery-api-key: "" # echo -n "your_smithery_key" | base64
+  redis-password: "ZGVmYXVsdHBhc3N3b3Jk" # defaultpassword
+  postgres-password: "ZGVmYXVsdHBhc3N3b3Jk" # defaultpassword
+  grafana-admin-password: "YWRtaW4=" # admin
+
+---
+# k8s/persistent-volumes.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: poce-data-pv
+  namespace: poce-system
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: fast-ssd
+  hostPath:
+    path: /data/poce
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: poce-data-pvc
+  namespace: poce-system
+  labels:
+    app: poce-project-creator
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data-pvc
+  namespace: poce-system
+  labels:
+    app: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data-pvc
+  namespace: poce-system
+  labels:
+    app: postgres
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: fast-ssd
+
+---
+# k8s/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poce-app
+  namespace: poce-system
+  labels:
+    app: poce-project-creator
+    component: main-app
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: poce-project-creator
+      component: main-app
+  template:
+    metadata:
+      labels:
+        app: poce-project-creator
+        component: main-app
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: poce-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: poce-app
+        image: poce/project-creator:4.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: POCE_MODE
+          value: "production"
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: poce-secrets
+              key: github-token
+        - name: SMITHERY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: poce-secrets
+              key: smithery-api-key
+        - name: REDIS_HOST
+          value: "redis-service"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: poce-secrets
+              key: redis-password
+        - name: POSTGRES_HOST
+          value: "postgres-service"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: poce-secrets
+              key: postgres-password
+        - name: POCE_CONFIG_PATH
+          value: "/app/config"
+        - name: POCE_DATA_PATH
+          value: "/app/data"
+        - name: POCE_LOGS_PATH
+          value: "/app/logs"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /app/config
+          readOnly: true
+        - name: data-volume
+          mountPath: /app/data
+        - name: logs-volume
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 10
+      volumes:
+      - name: config-volume
+        configMap:
+          name: poce-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: poce-data-pvc
+      - name: logs-volume
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "app"
+        operator: "Equal"
+        value: "poce"
+        effect: "NoSchedule"
+
+---
+# k8s/redis-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: poce-system
+  labels:
+    app: redis
+    component: cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      component: cache
+  template:
+    metadata:
+      labels:
+        app: redis
+        component: cache
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+        - --requirepass
+        - $(REDIS_PASSWORD)
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: poce-secrets
+              key: redis-password
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        - name: redis-config
+          mountPath: /etc/redis
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-data-pvc
+      - name: redis-config
+        configMap:
+          name: redis-config
+
+---
+# k8s/postgres-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: poce-system
+  labels:
+    app: postgres
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      component: database
+  template:
+    metadata:
+      labels:
+        app: postgres
+        component: database
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        env:
+        - name: POSTGRES_DB
+          value: "poce"
+        - name: POSTGRES_USER
+          value: "poce"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: poce-secrets
+              key: postgres-password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - poce
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -U
+            - poce
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data-pvc
+
+---
+# k8s/services.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: poce-app-service
+  namespace: poce-system
+  labels:
+    app: poce-project-creator
+    component: main-app
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: poce-project-creator
+    component: main-app
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: poce-system
+  labels:
+    app: redis
+    component: cache
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+    name: redis
+  selector:
+    app: redis
+    component: cache
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: poce-system
+  labels:
+    app: postgres
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: postgres
+    component: database
+
+---
+# k8s/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: poce-ingress
+  namespace: poce-system
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - poce.yourdomain.com
+    secretName: poce-tls
+  rules:
+  - host: poce.yourdomain.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: poce-app-service
+            port:
+              number: 8080
+
+---
+# k8s/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: poce-app-hpa
+  namespace: poce-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: poce-app
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+      - type: Pods
+        value: 4
+        periodSeconds: 60
+      selectPolicy: Max
+
+---
+# k8s/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: poce-service-account
+  namespace: poce-system
+  labels:
+    app: poce-project-creator
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: poce-cluster-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: poce-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: poce-service-account
+  namespace: poce-system
+roleRef:
+  kind: ClusterRole
+  name: poce-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# k8s/network-policy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: poce-network-policy
+  namespace: poce-system
+spec:
+  podSelector:
+    matchLabels:
+      app: poce-project-creator
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8080
+  - from:
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+
+---
+# k8s/monitoring/prometheus-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: poce-system
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    rule_files:
+    - "/etc/prometheus/rules/*.yml"
+    
+    scrape_configs:
+    - job_name: 'poce-app'
+      kubernetes_sd_configs:
+      - role: pod
+        namespaces:
+          names:
+          - poce-system
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
+---
+# k8s/monitoring/prometheus-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: poce-system
+  labels:
+    app: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      serviceAccountName: prometheus-service-account
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        args:
+        - '--config.file=/etc/prometheus/prometheus.yml'
+        - '--storage.tsdb.path=/prometheus'
+        - '--web.console.libraries=/etc/prometheus/console_libraries'
+        - '--web.console.templates=/etc/prometheus/consoles'
+        - '--storage.tsdb.retention.time=30d'
+        - '--web.enable-lifecycle'
+        ports:
+        - containerPort: 9090
+          name: prometheus
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus
+        - name: prometheus-data
+          mountPath: /prometheus
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+      volumes:
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+      - name: prometheus-data
+        emptyDir: {}
+
+---
+# k8s/backup/backup-cronjob.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: poce-backup
+  namespace: poce-system
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:15-alpine
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: poce-secrets
+                  key: postgres-password
+            command:
+            - /bin/bash
+            - -c
+            - |
+              pg_dump -h postgres-service -U poce -d poce > /backup/poce-$(date +%Y%m%d-%H%M%S).sql
+              find /backup -name "poce-*.sql" -mtime +7 -delete
+            volumeMounts:
+            - name: backup-storage
+              mountPath: /backup
+          volumes:
+          - name: backup-storage
+            persistentVolumeClaim:
+              claimName: poce-backup-pvc
+          restartPolicy: OnFailure
+
+---
+# k8s/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: poce-system
+
+resources:
+- namespace.yaml
+- configmap.yaml
+- secrets.yaml
+- persistent-volumes.yaml
+- deployment.yaml
+- redis-deployment.yaml
+- postgres-deployment.yaml
+- services.yaml
+- ingress.yaml
+- hpa.yaml
+- rbac.yaml
+- network-policy.yaml
+- monitoring/prometheus-config.yaml
+- monitoring/prometheus-deployment.yaml
+- backup/backup-cronjob.yaml
+
+images:
+- name: poce/project-creator
+  newTag: "4.0.0"
+
+patchesStrategicMerge:
+- patches/production-patches.yaml
+
+commonLabels:
+  app.kubernetes.io/name: poce-project-creator
+  app.kubernetes.io/version: "4.0.0"
+  app.kubernetes.io/component: devops-automation
+  app.kubernetes.io/part-of: poce-platform
+  app.kubernetes.io/managed-by: kustomize
+
+commonAnnotations:
+  deployment.kubernetes.io/revision: "1"
+  kubernetes.io/change-cause: "Initial deployment of P.O.C.E. Project Creator v4.0"
