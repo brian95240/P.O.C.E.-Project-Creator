@@ -32,7 +32,7 @@ try:
     from poce_project_creator_v4 import (
         ConfigManager, WorkflowEngine, MCPServerManager, POCEApp
     )
-    from mcp_integration_templates import (
+    from mcp_integration import (
         EnhancedMCPManager, Context7Server, ClaudeTaskManagerServer
     )
 except ImportError as e:
@@ -388,7 +388,7 @@ class TestMCPIntegration:
     @pytest.mark.asyncio
     async def test_mcp_server_communication(self, mock_mcp_servers):
         """Test communication with MCP servers"""
-        from mcp_integration_templates import EnhancedMCPManager
+        from mcp_integration import EnhancedMCPManager
         
         mcp_manager = EnhancedMCPManager()
         
@@ -408,7 +408,7 @@ class TestMCPIntegration:
     @pytest.mark.asyncio
     async def test_distributed_task_execution(self, mock_mcp_servers):
         """Test distributed task execution across multiple servers"""
-        from mcp_integration_templates import EnhancedMCPManager
+        from mcp_integration import EnhancedMCPManager
         
         mcp_manager = EnhancedMCPManager()
         

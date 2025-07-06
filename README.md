@@ -107,19 +107,19 @@ P.O.C.E.-Project-Creator/
 │   ├── poce_master_orchestrator.py   # Core orchestration engine
 │   ├── poce_cli.py                   # Command-line interface
 │   ├── poce_config.yaml              # Configuration file
-│   ├── documentation_doc_generator.py # Documentation generator
-│   ├── infrastructure_iac_manager.py # Infrastructure as Code manager
-│   ├── monitoring_monitoring_system.py # Monitoring system
-│   ├── security_security_manager.py  # Security manager
-│   ├── performance_optimization_engine.py # Performance optimizer
-│   ├── mcp_integration_templates.py  # MCP integration templates
-│   ├── tests_test_framework.py       # Testing framework
+│   ├── doc_generator.py              # Documentation generator
+│   ├── infrastructure_manager.py     # Infrastructure as Code manager
+│   ├── monitoring_system.py          # Monitoring system
+│   ├── security_manager.py           # Security manager
+│   ├── performance_engine.py         # Performance optimizer
+│   ├── mcp_integration.py            # MCP integration templates
+│   ├── test_framework.py             # Testing framework
 │   └── k8s_namespace.yaml            # Kubernetes configuration
 ├── 📁 docs/                          # Documentation directory
 │   ├── P.O.C.E. Project Creator.txt
 │   └── P.O.C.E. Project Creator v4.0 - Installation & Setup Guide.txt
 └── 📁 .github/workflows/             # CI/CD automation
-    └── github_workflows_main.yml     # GitHub Actions workflow
+    └── main.yml                      # GitHub Actions workflow
 ```
 
 ## 🔧 Core Components
@@ -164,7 +164,7 @@ kubectl apply -f k8s_namespace.yaml
 Run the test suite:
 
 ```bash
-python src/tests_test_framework.py
+python src/test_framework.py
 ```
 
 ## 📊 Monitoring

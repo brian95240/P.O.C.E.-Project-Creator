@@ -1,4 +1,4 @@
-# mcp_integration_templates.py
+# mcp_integration.py
 """
 P.O.C.E. Project Creator - MCP Server Integration Templates v4.0
 Comprehensive templates and examples for integrating with various MCP servers
