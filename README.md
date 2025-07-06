@@ -64,18 +64,18 @@ pip install -r requirements.txt
 ### Basic Usage
 
 ```bash
-python poce_project_creator_v4.py
+python src/poce_project_creator_v4.py
 ```
 
 ### CLI Usage
 
 ```bash
-python poce_cli.py --help
+python src/poce_cli.py --help
 ```
 
 ### Configuration
 
-Edit `poce_config.yaml` to customize your project settings:
+Edit `src/poce_config.yaml` to customize your project settings:
 
 ```yaml
 # Example configuration
@@ -96,22 +96,30 @@ security:
 
 ```
 P.O.C.E.-Project-Creator/
-├── poce_project_creator_v4.py      # Main application
-├── poce_master_orchestrator.py     # Core orchestration engine
-├── poce_cli.py                     # Command-line interface
-├── poce_config.yaml               # Configuration file
-├── requirements.txt               # Python dependencies
-├── Dockerfile.txt                 # Docker configuration
-├── documentation_doc_generator.py  # Documentation generator
-├── infrastructure_iac_manager.py  # Infrastructure as Code manager
-├── monitoring_monitoring_system.py # Monitoring system
-├── security_security_manager.py   # Security manager
-├── performance_optimization_engine.py # Performance optimizer
-├── mcp_integration_templates.py   # MCP integration templates
-├── tests_test_framework.py        # Testing framework
-├── github_workflows_main.yml      # GitHub Actions workflow
-├── k8s_namespace.yaml             # Kubernetes configuration
-└── How to set-up/                 # Setup documentation
+├── 📄 README.md                      # Project documentation
+├── 📄 LICENSE-GPL                    # GPL v3.0 license
+├── 📄 LICENSE-COMMERCIAL              # Commercial license
+├── 📄 setup.py                       # PyPI packaging configuration
+├── 📄 requirements.txt               # Python dependencies
+├── 📄 Dockerfile.txt                 # Docker configuration
+├── 📁 src/                           # Source code directory
+│   ├── poce_project_creator_v4.py    # Main application
+│   ├── poce_master_orchestrator.py   # Core orchestration engine
+│   ├── poce_cli.py                   # Command-line interface
+│   ├── poce_config.yaml              # Configuration file
+│   ├── documentation_doc_generator.py # Documentation generator
+│   ├── infrastructure_iac_manager.py # Infrastructure as Code manager
+│   ├── monitoring_monitoring_system.py # Monitoring system
+│   ├── security_security_manager.py  # Security manager
+│   ├── performance_optimization_engine.py # Performance optimizer
+│   ├── mcp_integration_templates.py  # MCP integration templates
+│   ├── tests_test_framework.py       # Testing framework
+│   └── k8s_namespace.yaml            # Kubernetes configuration
+├── 📁 docs/                          # Documentation directory
+│   ├── P.O.C.E. Project Creator.txt
+│   └── P.O.C.E. Project Creator v4.0 - Installation & Setup Guide.txt
+└── 📁 .github/workflows/             # CI/CD automation
+    └── github_workflows_main.yml     # GitHub Actions workflow
 ```
 
 ## 🔧 Core Components
@@ -156,7 +164,7 @@ kubectl apply -f k8s_namespace.yaml
 Run the test suite:
 
 ```bash
-python tests_test_framework.py
+python src/tests_test_framework.py
 ```
 
 ## 📊 Monitoring
@@ -185,7 +193,12 @@ P.O.C.E. includes comprehensive security features:
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is available under dual licensing:
+
+- **GPL v3.0**: For open source projects and personal use (see `LICENSE-GPL`)
+- **Commercial License**: For proprietary applications and commercial use (see `LICENSE-COMMERCIAL`)
+
+For commercial licensing inquiries, please contact: brian95240@users.noreply.github.com
 
 ## 🆘 Support
 
