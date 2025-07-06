@@ -1,0 +1,40 @@
+# P.O.C.E. Project Creator v4.0 - Required Dependencies
+# Core GUI Framework
+customtkinter>=5.0.0
+
+# GitHub Integration
+PyGithub>=1.58.0
+requests>=2.28.0
+
+# File Processing
+PyPDF2>=3.0.0
+pyyaml>=6.0
+
+# Async Operations
+aiohttp>=3.8.0
+asyncio-timeout>=4.0.2
+
+# Development Tools
+flake8>=6.0.0
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.0.0
+
+# Security Tools
+bandit>=1.7.5
+safety>=2.3.0
+
+# Testing Framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+pytest-asyncio>=0.21.0
+
+# Report Generation
+jinja2>=3.1.0
+markdown>=3.5.0
+
+# Additional Utilities
+pathlib2>=2.3.7
+python-dateutil>=2.8.2
+colorama>=0.4.6
